@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearFlow — BOCHK Compliance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --boc-red: #b6002a;
+      --boc-red-dark: #8f0022;
+      --boc-red-light: #fde8ed;
+      --boc-gold: #c9a227;
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --surface-2: #fafbfc;
+      --border: #dde1e6;
+      --border-strong: #c1c7cd;
+      --text: #1a1a1a;
+      --text-secondary: #525252;
+      --muted: #6f6f6f;
+      --accent: var(--boc-red);
+      --accent-hover: var(--boc-red-dark);
+      --accent-dim: var(--boc-red-light);
+      --danger: #b6002a;
+      --danger-bg: #fde8ed;
+      --warning: #b45309;
+      --warning-bg: #fef3c7;
+      --success: #047857;
+      --success-bg: #d1fae5;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 6px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    .top-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--boc-red-dark), var(--boc-red), var(--boc-red-dark));
+    }
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .logo { display: flex; align-items: center; gap: 0.875rem; }
+    .logo-mark {
+      width: 44px; height: 44px;
+      background: var(--boc-red);
+      border-radius: 4px;
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 0.85rem; color: white;
+      letter-spacing: -0.02em;
+    }
+    .logo h1 { font-size: 1.4rem; font-weight: 700; color: var(--boc-red); }
+    .logo span { color: var(--muted); font-size: 0.82rem; display: block; font-weight: 400; }
+    .stakes-banner {
+      background: var(--boc-red-light);
+      border: 1px solid #f5c6cf;
+      border-left: 4px solid var(--boc-red);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem;
+      color: var(--boc-red-dark);
+      max-width: 520px;
+    }
+    .stakes-banner strong { color: var(--boc-red); }
+    .main { padding: 1.5rem 2rem 2.5rem; max-width: 1480px; margin: 0 auto; }
+    .panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .panel-grid .panel-full { grid-column: 1 / -1; }
+    @media (max-width: 1100px) { .panel-grid { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .panel-header {
+      padding: 0.875rem 1.25rem;
+      border-bottom: 3px solid var(--boc-red);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      gap: 0.5rem;
+    }
+    .panel-header h2 { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .panel-badge {
+      font-size: 0.68rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+      background: var(--accent-dim);
+      color: var(--boc-red);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .panel-body { padding: 1.25rem; }
+    select, input, button, textarea {
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    select, input, textarea {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 0.55rem 0.75rem;
+      width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--boc-red);
+      box-shadow: 0 0 0 3px rgba(182,0,42,0.12);
+    }
+    button {
+      background: var(--boc-red);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.55rem 1.1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.1s, opacity 0.15s;
+    }
+    button:hover:not(:disabled) { background: var(--boc-red-dark); }
+    button:active:not(:disabled) { transform: scale(0.98); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    button.secondary, .feed-filters button, .tabs button, .mode-tabs button.secondary {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    button.secondary:hover:not(:disabled) { background: var(--bg); border-color: var(--boc-red); color: var(--boc-red); }
+    .feed-filters button.active, .tabs button.active, .mode-tabs button.active {
+      background: var(--boc-red);
+      border-color: var(--boc-red);
+      color: white;
+    }
+    .mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .mode-tabs button { flex: 1; }
+    .case-form { display: none; }
+    .case-form.active { display: block; }
+    .sample-panel { display: none; }
+    .sample-panel.active { display: block; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-field label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .form-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0; }
+    .form-actions button { flex: 1; min-width: 140px; }
+    .json-toggle {
+      font-size: 0.8rem;
+      color: var(--boc-red);
+      cursor: pointer;
+      margin: 0.75rem 0 0.5rem;
+      display: inline-block;
+      font-weight: 600;
+      user-select: none;
+    }
+    .json-toggle:hover { text-decoration: underline; }
+    .json-area { display: none; margin-bottom: 0.75rem; }
+    .json-area.visible { display: block; }
+    .json-area textarea { min-height: 110px; font-family: monospace; font-size: 0.78rem; }
+    .txn-selector { display: flex; gap: 0.75rem; margin-bottom: 0; flex-wrap: wrap; }
+    .txn-selector select { flex: 1; min-width: 200px; }
+    .results-divider {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 1.25rem 0;
+    }
+    #risk-results { min-height: 60px; }
+    #risk-results:empty { display: none; }
+    #risk-results .placeholder {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 1.5rem;
+      text-align: center;
+      background: var(--surface-2);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+    .score-display {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .score-ring { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .score-value {
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      font-size: 2rem; font-weight: 700;
+    }
+    .score-ring .score-label {
+      position: absolute; bottom: 22px; left: 0; right: 0;
+      text-align: center; font-size: 0.62rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+    }
+    .score-meta h3 { font-size: 1.05rem; margin-bottom: 0.2rem; color: var(--text); }
+    .risk-pill {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .risk-high { background: var(--danger-bg); color: var(--danger); }
+    .risk-medium { background: var(--warning-bg); color: var(--warning); }
+    .risk-low { background: var(--success-bg); color: var(--success); }
+    .section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--boc-red);
+      margin: 1rem 0 0.5rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.35rem;
+    }
+    .rules-list { list-style: none; }
+    .rules-list li {
+      padding: 0.65rem 0.85rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.45rem;
+      font-size: 0.88rem;
+    }
+    .rules-list .rule-source { font-size: 0.72rem; color: var(--boc-red); font-weight: 600; margin-bottom: 0.15rem; }
+    .rules-list .severity-critical { border-left: 4px solid var(--boc-red); }
+    .rules-list .severity-high { border-left: 4px solid var(--warning); }
+    .rules-list .severity-medium { border-left: 4px solid var(--border-strong); }
+    .explanation-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.65;
+      margin-top: 0.5rem;
+    }
+    .explanation-box.sme { border-left: 4px solid var(--boc-gold); }
+    .token-table { width: 100%; font-size: 0.82rem; border-collapse: collapse; margin-top: 0.5rem; }
+    .token-table td, .token-table th {
+      padding: 0.45rem 0.65rem;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .token-table th { background: var(--bg); color: var(--muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; }
+    .token-table .token { font-family: monospace; color: var(--boc-red); font-weight: 600; }
+    .action-bar {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--danger-bg);
+      border: 1px solid #f5c6cf;
+      border-left: 4px solid var(--boc-red);
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      color: var(--boc-red-dark);
+      font-weight: 500;
+    }
+    .feed-filters { display: flex; gap: 0.4rem; margin-bottom: 0.875rem; flex-wrap: wrap; }
+    .feed-filters button { font-size: 0.75rem; padding: 0.35rem 0.7rem; }
+    .feed-list { max-height: 340px; overflow-y: auto; }
+    .feed-item {
+      padding: 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.5rem;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .feed-item:hover { border-color: var(--boc-red); box-shadow: var(--shadow); }
+    .feed-item.relevant { border-color: var(--boc-red); background: var(--boc-red-light); }
+    .feed-item.expanded .feed-summary { display: block; }
+    .feed-item .feed-meta { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.3rem; flex-wrap: wrap; }
+    .feed-source {
+      font-size: 0.68rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      background: var(--boc-red);
+      color: white;
+      font-weight: 700;
+    }
+    .feed-date { font-size: 0.75rem; color: var(--muted); }
+    .feed-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.2rem; color: var(--text); }
+    .feed-summary { font-size: 0.82rem; color: var(--text-secondary); }
+    .feed-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.4rem; }
+    .tag {
+      font-size: 0.65rem;
+      padding: 0.12rem 0.4rem;
+      border-radius: 3px;
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .rag-box { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .rag-box .rag-input { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .rag-box .rag-input input { flex: 1; }
+    .rag-answer {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--boc-red);
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      display: none;
+      line-height: 1.6;
+    }
+    .rag-answer.visible { display: block; }
+    .corridor-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .corridor-table th, .corridor-table td {
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .corridor-table th {
+      background: var(--bg);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+    }
+    .corridor-table tbody tr { cursor: pointer; transition: background 0.12s; }
+    .corridor-table tbody tr:hover { background: var(--boc-red-light); }
+    .corridor-table tr.anomaly { background: #fff8f0; }
+    .corridor-table tr.row-myanmar { background: #fde8ed; font-weight: 600; }
+    .corridor-table tr.row-myanmar td:first-child { color: var(--boc-red); }
+    .corridor-table tr.row-cambodia { background: #fff4e6; font-weight: 600; }
+    .corridor-table tr.row-cambodia td:first-child { color: #b45309; }
+    .corridor-table tr.highlighted { background: var(--boc-red-light) !important; outline: 2px solid var(--boc-red); outline-offset: -2px; }
+    .corridor-table tr.selected { background: #fef9e7 !important; }
+    .genai-hero {
+      background: linear-gradient(135deg, #fde8ed 0%, #fff 100%);
+      border: 2px solid var(--boc-red);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .genai-hero .genai-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--boc-red);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .genai-hero p { font-size: 0.95rem; line-height: 1.7; color: var(--text); }
+    .score-compact {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.25rem;
+    }
+    .score-compact .score-ring { width: 80px; height: 80px; }
+    .score-compact .score-ring .score-value { font-size: 1.4rem; }
+    .score-compact .score-ring .score-label { bottom: 14px; font-size: 0.55rem; }
+    .panel3-briefing {
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      background: #fff4e6;
+      border: 1px solid #fcd9a0;
+      border-left: 4px solid #b45309;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+    .panel3-briefing h4 { color: #b45309; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .rag-demo-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.35rem; font-style: italic; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); min-height: 200px; }
+    .z-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; min-width: 60px; }
+    .z-bar-fill { height: 100%; border-radius: 3px; }
+    .anomaly-card {
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      background: #fff8f0;
+      border: 1px solid #fcd9a0;
+      border-left: 4px solid var(--warning);
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .anomaly-card.visible { display: block; }
+    .anomaly-card h4 { color: var(--warning); margin-bottom: 0.4rem; font-size: 0.88rem; font-weight: 700; }
+    .summary-stats { display: flex; gap: 0.875rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .stat-card {
+      flex: 1; min-width: 130px;
+      padding: 0.875rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--boc-red);
+      border-radius: var(--radius);
+    }
+    .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--boc-red); }
+    .stat-card .stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; }
+    .tabs { display: flex; gap: 0.35rem; margin-bottom: 0.75rem; }
+    .tabs button { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+    .loading {
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 1.25rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--boc-red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .flow-diagram {
+      display: flex; align-items: center; gap: 0.25rem;
+      font-size: 0.65rem; color: var(--muted);
+      margin-top: 1rem; flex-wrap: wrap;
+    }
+    .flow-diagram span {
+      padding: 0.2rem 0.5rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+    }
+    .flow-diagram .arrow { color: var(--boc-red); font-weight: 700; }
+    .case-context-banner {
+      margin-bottom: 0.875rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--boc-red-light);
+      border: 1px solid #f5c6cf;
+      border-left: 4px solid var(--boc-red);
+      border-radius: var(--radius);
+      font-size: 0.84rem;
+      display: none;
+      color: var(--boc-red-dark);
+    }
+    .case-context-banner.visible { display: block; }
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--text);
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      box-shadow: var(--shadow-md);
+      z-index: 999;
+      transform: translateY(120%);
+      transition: transform 0.25s ease;
+      max-width: 360px;
+    }
+    .toast.visible { transform: translateY(0); }
+    .toast.error { background: var(--boc-red); }
+  </style>
+</head>
+<body>
+  <div class="top-bar"></div>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">中銀</div>
+      <div>
+        <h1>ClearFlow</h1>
+        <span>Cross-Border Compliance Dashboard · BOCHK GBA Strategic Hub</span>
+      </div>
+    </div>
+    <div class="stakes-banner">
+      <strong>Regulatory cost of inaction:</strong> HKMA AML fines HKD 17.8M (2025) · Cross-border fraud losses HKD 8.1B (2025)
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="panel-grid">
+      <section class="panel" id="panel-risk">
+        <div class="panel-header">
+          <h2>Panel 1 — Transaction Risk Scorer</h2>
+          <span class="panel-badge">PaySim + Regulatory Data</span>
+        </div>
+        <div class="panel-body">
+          <div class="mode-tabs">
+            <button type="button" id="mode-your-case" class="active">Your Case</button>
+            <button type="button" id="mode-sample" class="secondary">Load Sample</button>
+          </div>
+
+          <div id="your-case-panel" class="case-form active">
+            <form id="case-form" novalidate>
+              <div class="form-grid">
+                <div class="form-field"><label for="f-customer">Customer / Company *</label><input id="f-customer" name="customer" required value="ABC Trading Ltd" placeholder="ABC Trading Ltd" /></div>
+                <div class="form-field"><label for="f-account">Account</label><input id="f-account" name="account" value="12345678" placeholder="12345678" /></div>
+                <div class="form-field"><label for="f-amount">Amount (HKD) *</label><input id="f-amount" name="amount_hkd" type="number" required min="1" value="2300000" placeholder="2300000" /></div>
+                <div class="form-field"><label for="currency-select">Currency</label><select name="currency" id="currency-select"></select></div>
+                <div class="form-field"><label for="destination-input">Destination Country *</label><input name="destination_country" id="destination-input" required list="destinations-list" value="Myanmar" placeholder="Myanmar" /></div>
+                <datalist id="destinations-list"></datalist>
+                <div class="form-field"><label for="f-origin">Origin Country</label><input id="f-origin" name="origin_country" value="Hong Kong" /></div>
+                <div class="form-field"><label for="f-counterparty">Counterparty</label><input id="f-counterparty" name="counterparty" value="XYZ Ltd" placeholder="XYZ Ltd" /></div>
+                <div class="form-field"><label for="purpose-select">Payment Purpose</label><select name="payment_purpose" id="purpose-select"></select></div>
+                <div class="form-field"><label for="industry-select">Industry</label><select name="industry" id="industry-select"></select></div>
+                <div class="form-field"><label for="size-select">Company Size</label><select name="company_size" id="size-select"></select></div>
+                <div class="form-field"><label for="f-age">Account Age (months)</label><input id="f-age" name="account_age_months" type="number" min="0" value="12" /></div>
+                <div class="form-field"><label for="f-freq">Transactions (last 30 days)</label><input id="f-freq" name="transaction_frequency_30d" type="number" min="0" value="12" /></div>
+                <div class="form-field"><label for="f-hour">Hour of Day (0–23)</label><input id="f-hour" name="hour_of_day" type="number" min="0" max="23" value="2" /></div>
+                <div class="form-field"><label for="f-history">Prior Counterparty History</label><select id="f-history" name="prior_counterparty_history"><option value="true">Yes</option><option value="false" selected>No</option></select></div>
+                <div class="form-field"><label for="f-flags">Prior Compliance Flags</label><input id="f-flags" name="historical_compliance_flags" type="number" min="0" value="0" /></div>
+                <div class="form-field"><label for="rating-select">Customer Risk Rating</label><select name="risk_rating" id="rating-select"></select></div>
+              </div>
+              <span class="json-toggle" id="json-toggle" role="button" tabindex="0">▸ Paste JSON instead</span>
+              <div class="json-area" id="json-area">
+                <textarea id="json-input" placeholder='{"customer":"ABC Trading Ltd","amount_hkd":2300000,"destination_country":"Myanmar"}'></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" id="btn-score">Score Transaction</button>
+                <button type="button" id="btn-clear" class="secondary">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="sample-panel" class="sample-panel">
+            <div class="txn-selector">
+              <select id="txn-select"><option>Loading samples…</option></select>
+              <button type="button" id="btn-load-sample">Load &amp; Score</button>
+            </div>
+          </div>
+
+          <hr class="results-divider" id="results-divider" style="display:none" />
+          <div id="risk-results">
+            <div class="placeholder" id="risk-placeholder">Enter your case details above and click <strong>Score Transaction</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-feed">
+        <div class="panel-header">
+          <h2>Panel 2 — Regulatory Pulse Feed</h2>
+          <span class="panel-badge">HKMA · PBOC · FATF · OFAC</span>
+        </div>
+        <div class="panel-body">
+          <div class="feed-filters" id="feed-filters">
+            <button type="button" class="active" data-filter="all">All</button>
+            <button type="button" data-filter="HKMA">HKMA</button>
+            <button type="button" data-filter="PBOC">PBOC</button>
+            <button type="button" data-filter="FATF">FATF</button>
+            <button type="button" data-filter="OFAC">OFAC</button>
+            <button type="button" data-filter="MAS">MAS</button>
+          </div>
+          <div id="case-feed-banner" class="case-context-banner"></div>
+          <div id="feed-list" class="feed-list loading"><span class="spinner"></span> Loading regulatory feed…</div>
+          <div class="rag-box">
+            <div class="section-title">Regulatory Q&amp;A (GenAI)</div>
+            <p class="rag-demo-label">Example query for HK → Myanmar corridor:</p>
+            <div class="rag-input">
+              <input id="rag-question" type="text" value="Has anything changed in the last 30 days that affects remittances from HK to Myanmar over USD 100k?" />
+              <button type="button" id="btn-rag">Ask</button>
+            </div>
+            <div id="rag-answer" class="rag-answer visible"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel panel-full" id="panel-anomaly">
+        <div class="panel-header">
+          <h2>Panel 3 — Pattern Anomaly Map</h2>
+          <span class="panel-badge">Z-Score Trend Analysis</span>
+        </div>
+        <div class="panel-body">
+          <div class="summary-stats" id="anomaly-stats"></div>
+          <div id="case-corridor-banner" class="case-context-banner"></div>
+          <div class="table-wrap">
+            <table class="corridor-table" id="corridor-table">
+              <thead>
+                <tr>
+                  <th>Corridor</th>
+                  <th>Industry</th>
+                  <th>Volume Tier</th>
+                  <th>Risk Tier</th>
+                  <th>6W Trend</th>
+                  <th>Z-Score</th>
+                  <th>Regulatory Triggers</th>
+                </tr>
+              </thead>
+              <tbody id="corridor-body"></tbody>
+            </table>
+          </div>
+          <div id="panel3-default-briefing" class="panel3-briefing"></div>
+          <div id="anomaly-narrative" class="anomaly-card"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API = "https://clearflow-backend-production-020a.up.railway.app";
+    let currentCase = null;
+    let allPatterns = [];
+    let activeFeedFilter = 'all';
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast visible' + (isError ? ' error' : '');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('visible'), 3500);
+    }
+
+    function setLoading(el, loading, text = 'Loading…') {
+      if (loading) {
+        el.dataset.prev = el.innerHTML;
+        el.innerHTML = `<span class="loading"><span class="spinner"></span>${text}</span>`;
+      } else if (el.dataset.prev !== undefined) {
+        el.innerHTML = el.dataset.prev;
+        delete el.dataset.prev;
+      }
+    }
+
+    async function api(path, opts) {
+      const res = await fetch(API + path, opts);
+      if (!res.ok) {
+        let detail = await res.text();
+        try { detail = JSON.parse(detail).detail || detail; } catch {}
+        throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+      }
+      return res.json();
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s ?? '';
+      return d.innerHTML;
+    }
+
+    function fillSelect(id, options, selected) {
+      document.getElementById(id).innerHTML = options.map(o =>
+        `<option value="${esc(o)}" ${o === selected ? 'selected' : ''}>${esc(o)}</option>`
+      ).join('');
+    }
+
+    function riskClass(level) {
+      return { High: 'risk-high', Medium: 'risk-medium', Low: 'risk-low' }[level] || 'risk-medium';
+    }
+
+    function scoreColor(score) {
+      if (score >= 70) return '#b6002a';
+      if (score >= 40) return '#b45309';
+      return '#047857';
+    }
+
+    function zBarColor(z) {
+      if (z >= 3) return '#b6002a';
+      if (z >= 2) return '#b45309';
+      return '#047857';
+    }
+
+    function renderScoreRing(score, compact = false) {
+      const size = compact ? 80 : 120;
+      const r = compact ? 34 : 52;
+      const sw = compact ? 7 : 10;
+      const cx = size / 2;
+      const c = 2 * Math.PI * r;
+      const offset = c - (score / 100) * c;
+      const color = scoreColor(score);
+      return `<div class="score-ring">
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+          <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#dde1e6" stroke-width="${sw}"/>
+          <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
+            stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-value" style="color:${color}">${score}</div>
+        <div class="score-label">Risk Score</div>
+      </div>`;
+    }
+
+    function riskTierClass(tier) {
+      if (!tier) return 'risk-low';
+      const t = String(tier).toLowerCase();
+      if (t.includes('very') || (t.includes('high') && !t.includes('medium') && !t.includes('medi'))) return 'risk-high';
+      if (t.includes('medi')) return 'risk-medium';
+      return 'risk-low';
+    }
+
+    function corridorRowClass(p) {
+      const classes = [];
+      if (p.anomaly_flag) classes.push('anomaly');
+      const c = p.corridor || '';
+      if (c.includes('Myanmar')) classes.push('row-myanmar');
+      if (c.includes('Cambodia')) classes.push('row-cambodia');
+      return classes.join(' ');
+    }
+
+    function corridorsMatch(a, b) {
+      return (a || '').replace('Hong Kong', 'HK') === (b || '').replace('Hong Kong', 'HK');
+    }
+
+    function showRagAnswer(question, answer) {
+      document.getElementById('rag-question').value = question;
+      const el = document.getElementById('rag-answer');
+      el.textContent = answer;
+      el.classList.add('visible');
+    }
+
+    function showCambodiaBriefing(pattern) {
+      if (!pattern?.anomaly_narrative) return;
+      const el = document.getElementById('panel3-default-briefing');
+      el.innerHTML = `<h4>⚑ Active Anomaly — ${esc(pattern.corridor)} (${esc(pattern.industry)}) · Z-score ${pattern.z_score} · +${pattern.trend_6w_pct}%</h4><p>${esc(pattern.anomaly_narrative)}</p>`;
+    }
+
+    function renderRiskPanel(data, txn) {
+      const rulesHtml = data.triggered_rules.length
+        ? data.triggered_rules.map(r => `
+            <li class="severity-${esc(r.severity)}">
+              <div class="rule-source">${esc(r.source)} · ${esc(r.reference)}</div>
+              <strong>${esc(r.rule)}</strong>
+            </li>`).join('')
+        : '<li>No regulatory rules triggered — standard monitoring applies.</li>';
+
+      const tokensHtml = Object.entries(data.tokenized_view).map(([k, v]) => {
+        const orig = {
+          customer: txn.customer,
+          account: txn.account,
+          amount: `HKD ${Number(txn.amount_hkd).toLocaleString()}`,
+          counterparty: txn.counterparty,
+        }[k];
+        return `<tr><th>${esc(k)}</th><td>${esc(orig || '—')}</td><td class="token">${esc(v)}</td></tr>`;
+      }).join('');
+
+      document.getElementById('risk-placeholder')?.remove();
+      document.getElementById('results-divider').style.display = 'block';
+
+      document.getElementById('risk-results').innerHTML = `
+        <div class="score-compact">
+          ${renderScoreRing(data.risk_score, true)}
+          <div class="score-meta">
+            <h3>${esc(txn.id)}</h3>
+            <p style="color:var(--muted);font-size:0.85rem;margin:0.2rem 0 0.35rem">${esc(txn.corridor)} · ${esc(txn.payment_purpose)}</p>
+            <span class="risk-pill ${riskClass(data.risk_level)}">${esc(data.risk_level)} Risk</span>
+          </div>
+        </div>
+
+        <div class="genai-hero">
+          <div class="genai-label">GenAI Compliance Explanation</div>
+          <div class="tabs" id="explanation-tabs">
+            <button type="button" class="active" data-tab="officer">Compliance Officer</button>
+            <button type="button" data-tab="sme">SME Customer View</button>
+          </div>
+          <div id="explanation-officer"><p>${esc(data.explanation_compliance_officer)}</p></div>
+          <div id="explanation-sme" hidden><p>${esc(data.explanation_sme)}</p></div>
+        </div>
+
+        <div class="action-bar">⚠ ${esc(data.recommended_action)}</div>
+
+        <div class="section-title">Triggered Regulatory Rules</div>
+        <ul class="rules-list">${rulesHtml}</ul>
+        <div class="section-title">Tokenization Layer (PII Protection)</div>
+        <table class="token-table">
+          <tr><th>Field</th><th>Original</th><th>Tokenized</th></tr>
+          ${tokensHtml}
+        </table>
+        <div class="flow-diagram">
+          <span>Transaction</span><span class="arrow">→</span>
+          <span>Risk Engine</span><span class="arrow">→</span>
+          <span>Tokenization</span><span class="arrow">→</span>
+          <span>GenAI Module</span><span class="arrow">→</span>
+          <span>Explanation</span>
+        </div>`;
+
+      document.querySelector('.genai-hero')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function formToPayload(form) {
+      const fd = new FormData(form);
+      const payload = Object.fromEntries(fd.entries());
+      payload.amount_hkd = parseFloat(payload.amount_hkd);
+      if (!payload.customer?.trim()) throw new Error('Customer name is required');
+      if (!payload.destination_country?.trim()) throw new Error('Destination country is required');
+      if (!payload.amount_hkd || payload.amount_hkd <= 0) throw new Error('Amount must be greater than 0');
+      payload.account_age_months = parseInt(payload.account_age_months, 10) || 0;
+      payload.transaction_frequency_30d = parseInt(payload.transaction_frequency_30d, 10) || 0;
+      payload.hour_of_day = Math.min(23, Math.max(0, parseInt(payload.hour_of_day, 10) || 0));
+      payload.historical_compliance_flags = parseInt(payload.historical_compliance_flags, 10) || 0;
+      payload.prior_counterparty_history = payload.prior_counterparty_history === 'true';
+      return payload;
+    }
+
+    function fillFormFromTransaction(txn) {
+      const form = document.getElementById('case-form');
+      const map = {
+        customer: txn.customer, account: txn.account || '',
+        amount_hkd: txn.amount_hkd, currency: txn.currency,
+        destination_country: txn.destination_country,
+        origin_country: txn.origin_country || 'Hong Kong',
+        counterparty: txn.counterparty || '',
+        payment_purpose: txn.payment_purpose, industry: txn.industry,
+        company_size: txn.company_size, account_age_months: txn.account_age_months,
+        transaction_frequency_30d: txn.transaction_frequency_30d,
+        hour_of_day: txn.hour_of_day,
+        prior_counterparty_history: String(txn.prior_counterparty_history !== false),
+        historical_compliance_flags: txn.historical_compliance_flags || 0,
+        risk_rating: txn.risk_rating,
+      };
+      Object.entries(map).forEach(([k, v]) => { if (form.elements[k]) form.elements[k].value = v; });
+    }
+
+    async function scoreCase(payload) {
+      const btn = document.getElementById('btn-score');
+      const sampleBtn = document.getElementById('btn-load-sample');
+      btn.disabled = true;
+      sampleBtn.disabled = true;
+      document.getElementById('risk-results').innerHTML = '<div class="loading"><span class="spinner"></span>Scoring transaction…</div>';
+      document.getElementById('results-divider').style.display = 'block';
+
+      try {
+        const result = await api('/api/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        currentCase = result.transaction;
+        renderRiskPanel(result.assessment, result.transaction);
+        renderFeed(result.relevant_regulations, true);
+        updateCaseBanners(result);
+        highlightCorridor(result.transaction.corridor, result.corridor_context);
+        if (result.demo_rag) showRagAnswer(result.demo_rag.question, result.demo_rag.answer);
+        await loadCorridors();
+        highlightCorridor(result.transaction.corridor, result.corridor_context);
+        showToast(`Scored ${result.transaction.id} — ${result.assessment.risk_level} risk (${result.assessment.risk_score}/100)`);
+        return result;
+      } finally {
+        btn.disabled = false;
+        sampleBtn.disabled = false;
+      }
+    }
+
+    async function loadTransaction(txnId) {
+      const txn = await api('/api/transactions').then(list => list.find(t => t.id === txnId));
+      if (!txn) throw new Error('Sample not found');
+      fillFormFromTransaction(txn);
+      document.getElementById('mode-your-case').click();
+      await scoreCase(txn);
+    }
+
+    function updateCaseBanners(result) {
+      const txn = result.transaction;
+      const feedBanner = document.getElementById('case-feed-banner');
+      feedBanner.innerHTML = `<strong>Relevant to your case:</strong> ${result.relevant_regulations.length} regulation(s) for <strong>${esc(txn.corridor)}</strong> · ${esc(txn.payment_purpose)}`;
+      feedBanner.classList.add('visible');
+
+      const ctx = result.corridor_context;
+      const corridorBanner = document.getElementById('case-corridor-banner');
+      if (ctx) {
+        corridorBanner.innerHTML = `<strong>Your case corridor:</strong> ${esc(ctx.corridor)} (${esc(ctx.industry)}) · Z-score ${ctx.z_score} · ${ctx.match_type === 'computed' ? 'Computed from your inputs' : 'Matched benchmark data'}`;
+        corridorBanner.classList.add('visible');
+        if (ctx.anomaly_narrative) {
+          const card = document.getElementById('anomaly-narrative');
+          card.innerHTML = `<h4>Case Corridor Briefing — ${esc(ctx.corridor)}</h4><p>${esc(ctx.anomaly_narrative)}</p>`;
+          card.classList.add('visible');
+        }
+      }
+    }
+
+    function renderFeed(items, relevantOnly = false) {
+      const el = document.getElementById('feed-list');
+      el.className = 'feed-list';
+      if (!items.length) {
+        el.innerHTML = '<p class="loading">No matching regulatory updates</p>';
+        return;
+      }
+      el.innerHTML = items.map(item => `
+        <div class="feed-item ${relevantOnly ? 'relevant' : ''}" tabindex="0" role="button"
+             aria-label="${esc(item.title)}">
+          <div class="feed-meta">
+            <span class="feed-source">${esc(item.source)}</span>
+            <span class="feed-date">${esc(item.date)}</span>
+            <span class="risk-pill ${item.severity === 'critical' || item.severity === 'high' ? 'risk-high' : item.severity === 'medium' ? 'risk-medium' : 'risk-low'}" style="font-size:0.62rem">${esc(item.severity)}</span>
+          </div>
+          <div class="feed-title">${esc(item.title)}</div>
+          <div class="feed-summary">${esc(item.summary)}</div>
+          <div class="feed-tags">${item.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+        </div>`).join('');
+    }
+
+    async function loadFeed(source) {
+      activeFeedFilter = source || 'all';
+      const el = document.getElementById('feed-list');
+      el.innerHTML = '<div class="loading"><span class="spinner"></span>Loading…</div>';
+      let path = '/api/regulatory-feed';
+      const params = [];
+      if (source && source !== 'all') params.push(`source=${encodeURIComponent(source)}`);
+      if (currentCase?.destination_country) params.push(`destination=${encodeURIComponent(currentCase.destination_country)}`);
+      else if (!currentCase) params.push('demo=true');
+      if (params.length) path += '?' + params.join('&');
+      try {
+        const items = await api(path);
+        renderFeed(items, !!currentCase);
+      } catch (err) {
+        el.innerHTML = `<p class="loading" style="color:var(--boc-red)">${esc(err.message)}</p>`;
+      }
+    }
+
+    async function loadCorridors() {
+      try {
+        const data = await api('/api/corridor-patterns');
+        renderCorridors(data);
+      } catch (err) {
+        document.getElementById('corridor-body').innerHTML =
+          `<tr><td colspan="7" style="padding:1rem;color:var(--boc-red)">Failed to load corridors: ${esc(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderCorridors(data) {
+      allPatterns = data.patterns || [];
+      const summary = data.summary || { total_corridors_monitored: 0, anomalies_detected: 0, highest_z_score: 0 };
+      const patterns = allPatterns;
+
+      document.getElementById('anomaly-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${summary.total_corridors_monitored}</div><div class="stat-label">Corridors Monitored</div></div>
+        <div class="stat-card"><div class="stat-value">${summary.anomalies_detected}</div><div class="stat-label">Anomalies Detected</div></div>
+        <div class="stat-card"><div class="stat-value">${Number(summary.highest_z_score || 0).toFixed(1)}</div><div class="stat-label">Highest Z-Score</div></div>`;
+
+      if (!patterns.length) {
+        document.getElementById('corridor-body').innerHTML =
+          '<tr><td colspan="7" style="padding:1rem;color:var(--muted)">No corridor data available</td></tr>';
+        return;
+      }
+
+      document.getElementById('corridor-body').innerHTML = patterns.map(p => {
+        const corridor = p.corridor || '';
+        const industry = p.industry || '';
+        const trend = Number(p.trend_6w_pct || 0);
+        const z = Number(p.z_score || 0);
+        const triggers = (p.regulatory_triggers || []).join(', ');
+        return `<tr class="${corridorRowClass(p)}" data-corridor="${esc(corridor)}" data-industry="${esc(industry)}" tabindex="0">
+          <td><strong>${esc(corridor)}</strong>${p.anomaly_flag ? ' ⚑' : ''}</td>
+          <td>${esc(industry)}</td>
+          <td>${esc(p.volume_tier || '—')}</td>
+          <td><span class="risk-pill ${riskTierClass(p.risk_tier)}">${esc(p.risk_tier || '—')}</span></td>
+          <td style="color:${trend > 50 ? 'var(--danger)' : trend > 15 ? 'var(--warning)' : 'var(--success)'};font-weight:600">+${trend}%</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <span style="font-weight:600">${z.toFixed(1)}</span>
+              <div class="z-bar" style="width:72px"><div class="z-bar-fill" style="width:${Math.min(z/4*100,100)}%;background:${zBarColor(z)}"></div></div>
+            </div>
+          </td>
+          <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(triggers)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function highlightCorridor(corridor, context) {
+      document.querySelectorAll('#corridor-body tr').forEach(row => {
+        const match = corridorsMatch(row.dataset.corridor, corridor);
+        row.classList.toggle('highlighted', match);
+        if (match) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+      if (context?.anomaly_narrative) {
+        const card = document.getElementById('anomaly-narrative');
+        card.innerHTML = `<h4>Case Corridor Briefing — ${esc(context.corridor)}</h4><p>${esc(context.anomaly_narrative)}</p>`;
+        card.classList.add('visible');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function showCorridorBriefing(corridor, industry) {
+      const pattern = allPatterns.find(p => p.corridor === corridor && p.industry === industry);
+      document.querySelectorAll('#corridor-body tr').forEach(r => r.classList.remove('selected'));
+      const row = document.querySelector(`#corridor-body tr[data-corridor="${CSS.escape(corridor)}"][data-industry="${CSS.escape(industry)}"]`);
+      if (row) row.classList.add('selected');
+      const card = document.getElementById('anomaly-narrative');
+      if (pattern?.anomaly_narrative) {
+        card.innerHTML = `<h4>Anomaly Briefing — ${esc(corridor)} (${esc(industry)})</h4><p>${esc(pattern.anomaly_narrative)}</p>`;
+        card.classList.add('visible');
+      } else {
+        card.innerHTML = `<h4>Corridor Overview — ${esc(corridor)} (${esc(industry)})</h4><p>No anomaly briefing for this corridor. Z-score: ${pattern ? pattern.z_score : 'N/A'}. Standard monitoring applies.</p>`;
+        card.classList.add('visible');
+      }
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function switchMode(mode) {
+      const isYourCase = mode === 'your-case';
+      document.getElementById('mode-your-case').className = isYourCase ? 'active' : 'secondary';
+      document.getElementById('mode-sample').className = isYourCase ? 'secondary' : 'active';
+      document.getElementById('your-case-panel').classList.toggle('active', isYourCase);
+      document.getElementById('sample-panel').classList.toggle('active', !isYourCase);
+    }
+
+    async function init() {
+      const [txns, options] = await Promise.all([
+        api('/api/transactions'),
+        api('/api/form-options'),
+      ]);
+
+      fillSelect('currency-select', options.currencies, 'HKD');
+      fillSelect('purpose-select', options.payment_purposes, 'Cross-border transfer');
+      fillSelect('industry-select', options.industries, 'General');
+      fillSelect('size-select', options.company_sizes, 'SME');
+      fillSelect('rating-select', options.risk_ratings, 'Medium');
+      document.getElementById('destinations-list').innerHTML =
+        options.destinations.map(d => `<option value="${esc(d)}">`).join('');
+
+      const sel = document.getElementById('txn-select');
+      sel.innerHTML = txns.map(t =>
+        `<option value="${esc(t.id)}">${esc(t.id)} — ${esc(t.corridor)} — HKD ${t.amount_hkd.toLocaleString()}${t.is_demo_case ? ' ★' : ''}</option>`
+      ).join('');
+
+      document.getElementById('mode-your-case').addEventListener('click', () => switchMode('your-case'));
+      document.getElementById('mode-sample').addEventListener('click', () => switchMode('sample'));
+
+      document.getElementById('case-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        try {
+          const jsonText = document.getElementById('json-input').value.trim();
+          const payload = jsonText ? JSON.parse(jsonText) : formToPayload(e.target);
+          await scoreCase(payload);
+        } catch (err) {
+          document.getElementById('risk-results').innerHTML = `<p class="loading" style="color:var(--boc-red)">${esc(err.message)}</p>`;
+          showToast(err.message, true);
+        }
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', () => {
+        document.getElementById('case-form').reset();
+        fillFormFromTransaction({
+          customer: 'ABC Trading Ltd', account: '12345678', amount_hkd: 2300000,
+          currency: 'HKD', destination_country: 'Myanmar', origin_country: 'Hong Kong',
+          counterparty: 'XYZ Ltd', payment_purpose: 'Trade settlement', industry: 'Retail',
+          company_size: 'SME', account_age_months: 12, transaction_frequency_30d: 12,
+          hour_of_day: 2, prior_counterparty_history: false, historical_compliance_flags: 0,
+          risk_rating: 'Medium',
+        });
+        document.getElementById('json-input').value = '';
+        document.getElementById('risk-results').innerHTML = '<div class="placeholder" id="risk-placeholder">Enter your case details above and click <strong>Score Transaction</strong></div>';
+        document.getElementById('results-divider').style.display = 'none';
+        currentCase = null;
+        ['case-feed-banner', 'case-corridor-banner'].forEach(id => document.getElementById(id).classList.remove('visible'));
+        document.getElementById('anomaly-narrative').classList.remove('visible');
+        document.querySelectorAll('#corridor-body tr').forEach(r => r.classList.remove('highlighted', 'selected'));
+        loadFeed(activeFeedFilter);
+      });
+
+      const jsonToggle = document.getElementById('json-toggle');
+      jsonToggle.addEventListener('click', () => {
+        const area = document.getElementById('json-area');
+        area.classList.toggle('visible');
+        jsonToggle.textContent = area.classList.contains('visible') ? '▾ Hide JSON input' : '▸ Paste JSON instead';
+      });
+      jsonToggle.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jsonToggle.click(); } });
+
+      document.getElementById('btn-load-sample').addEventListener('click', async () => {
+        try { await loadTransaction(sel.value); }
+        catch (err) { showToast(err.message, true); }
+      });
+
+      document.getElementById('feed-filters').addEventListener('click', e => {
+        const btn = e.target.closest('button[data-filter]');
+        if (!btn) return;
+        document.querySelectorAll('#feed-filters button').forEach(b => {
+          b.className = b === btn ? 'active' : '';
+        });
+        loadFeed(btn.dataset.filter);
+      });
+
+      document.getElementById('btn-rag').addEventListener('click', async () => {
+        const q = document.getElementById('rag-question').value.trim();
+        if (!q) { showToast('Enter a question first', true); return; }
+        const btn = document.getElementById('btn-rag');
+        btn.disabled = true;
+        try {
+          const result = await api('/api/regulatory-query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: q }),
+          });
+          const el = document.getElementById('rag-answer');
+          el.textContent = result.answer;
+          el.classList.add('visible');
+        } catch (err) {
+          showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      document.getElementById('rag-question').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-rag').click(); }
+      });
+
+      document.getElementById('risk-results').addEventListener('click', e => {
+        const tabBtn = e.target.closest('#explanation-tabs button[data-tab]');
+        if (!tabBtn) return;
+        const tab = tabBtn.dataset.tab;
+        document.querySelectorAll('#explanation-tabs button').forEach(b => b.classList.toggle('active', b === tabBtn));
+        document.getElementById('explanation-officer').hidden = tab !== 'officer';
+        document.getElementById('explanation-sme').hidden = tab !== 'sme';
+      });
+
+      document.getElementById('corridor-body').addEventListener('click', e => {
+        const row = e.target.closest('tr[data-corridor]');
+        if (!row) return;
+        showCorridorBriefing(row.dataset.corridor, row.dataset.industry);
+      });
+
+      document.getElementById('corridor-body').addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const row = e.target.closest('tr[data-corridor]');
+          if (row) { e.preventDefault(); showCorridorBriefing(row.dataset.corridor, row.dataset.industry); }
+        }
+      });
+
+      await loadCorridors();
+      showCambodiaBriefing({ corridor: 'HK → Cambodia', industry: 'Retail', z_score: 3.6, trend_6w_pct: 78,
+        anomaly_narrative: 'The HK retail → Cambodia corridor has seen a 78% volume increase over 6 weeks (Z-score: 3.6), concentrated in transactions between HKD 45k–55k — just below the HKD 60k reporting threshold. This structuring pattern is consistent with FATF typology report ML-2024-07. Recommended action: escalate to senior compliance review.' });
+
+      let demo;
+      try {
+        demo = await api('/api/demo-content');
+        renderFeed(demo.regulatory_feed, true);
+        document.getElementById('case-feed-banner').innerHTML = '<strong>Demo feed:</strong> 4 regulatory updates for <strong>HK → Myanmar</strong> corridor (OFAC, FATF, HKMA)';
+        document.getElementById('case-feed-banner').classList.add('visible');
+        showRagAnswer(demo.rag.question, demo.rag.answer);
+        if (demo.cambodia_briefing) showCambodiaBriefing(demo.cambodia_briefing);
+        fillFormFromTransaction(demo.demo_case);
+        await scoreCase(demo.demo_case);
+      } catch {
+        renderFeed(await api('/api/regulatory-feed?demo=true'), true);
+        await scoreCase(formToPayload(document.getElementById('case-form')));
+      }
+    }
+
+    init().catch(err => {
+      document.getElementById('risk-results').innerHTML = `<p class="loading" style="color:var(--boc-red)">Error: ${esc(err.message)}. Is the server running?</p>`;
+      showToast('Cannot connect to server. Run: uvicorn main:app --port 8080', true);
+    });
+  </script>
+</body>
+</html>
