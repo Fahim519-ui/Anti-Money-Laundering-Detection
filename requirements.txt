@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+anthropic
+pandas
+numpy
+scikit-learn
+requests
+python-dotenv
